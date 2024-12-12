@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивный сайт</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        header, section {
+            margin: 20px;
+        }
+        .dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+        .news-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Добро пожаловать на мой сайт</h1>
+    <button onclick="toggleTheme()">Сменить тему</button>
+</header>
+
+<section id="news-section">
+    <h2>Новости</h2>
+    <button onclick="addNews()">Добавить новость</button>
+    <div id="news-container"></div>
+</section>
+
+<section id="feedback-section">
+    <h2>Форма обратной связи</h2>
+    <form id="feedback-form">
+        <label>
+            Имя: 
+            <input type="text" id="name" />
+            <span class="error hidden" id="name-error">Введите имя</span>
+        </label><br><br>
+        <label>
+            Email: 
+            <input type="email" id="email" />
+            <span class="error hidden" id="email-error">Введите email</span>
+        </label><br><br>
+        <label>
+            Сообщение: 
+            <textarea id="message"></textarea>
+            <span class="error hidden" id="message-error">Введите сообщение</span>
+        </label><br><br>
+        <button type="submit">Отправить</button>
+    </form>
+    <h3>Комментарии</h3>
+    <div id="comments"></div>
+</section>
+
+<section id="animation-section">
+    <h2>Анимация при прокрутке</h2>
+    <div class="animated-block" style="margin: 20px 0; padding: 20px; border: 1px solid #ccc; transition: transform 0.5s, opacity 0.5s;">
+        Этот блок изменяет стиль при прокрутке!
+    </div>
+</section>
+
+<div id="notification" class="notification hidden"></div>
+
+<script>
+    function addNews() {
+        const newsContainer = document.getElementById('news-container');
+        const newsItem = document.createElement('div');
+        newsItem.className = 'news-item';
+        newsItem.innerHTML = `
+            <span>Новая новость от ${new Date().toLocaleString()}</span>
+            <button onclick="deleteNews(this)">Удалить</button>
+        `;
+        newsContainer.appendChild(newsItem);
+        showNotification('Новость добавлена успешно!');
+    }
+
+    function deleteNews(button) {
+        button.parentElement.remove();
+        showNotification('Новость удалена успешно!');
+    }
+
+    function showNotification(message) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.remove('hidden');
+        setTimeout(() => notification.classList.add('hidden'), 5000);
+    }
+
+    const feedbackForm = document.getElementById('feedback-form');
+    feedbackForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const message = document.getElementById('message');
+
+        let valid = true;
+        if (!name.value.trim()) {
+            document.getElementById('name-error').classList.remove('hidden');
+            valid = false;
+        } else {
+            document.getElementById('name-error').classList.add('hidden');
+        }
+        if (!email.value.trim()) {
+            document.getElementById('email-error').classList.remove('hidden');
+            valid = false;
+        } else {
+            document.getElementById('email-error').classList.add('hidden');
+        }
+        if (!message.value.trim()) {
+            document.getElementById('message-error').classList.remove('hidden');
+            valid = false;
+        } else {
+            document.getElementById('message-error').classList.add('hidden');
+        }
+
+        if (valid) {
+            const comments = document.getElementById('comments');
+            const comment = document.createElement('div');
+            comment.textContent = `Комментарий от ${name.value}: ${message.value}`;
+            comments.appendChild(comment);
+            feedbackForm.reset();
+            showNotification('Форма успешно отправлена!');
+        }
+    });
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+    };
+
+    const animatedBlock = document.querySelector('.animated-block');
+    window.addEventListener('scroll', () => {
+        const rect = animatedBlock.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            animatedBlock.style.transform = 'translateY(0)';
+            animatedBlock.style.opacity = '1';
+        } else {
+            animatedBlock.style.transform = 'translateY(100px)';
+            animatedBlock.style.opacity = '0';
+        }
+    });
+</script>
+
+</body>
+</html>
